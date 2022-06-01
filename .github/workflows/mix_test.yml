@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MIX_ENV: test
-      BUILDKITE_ANALYTICS_API_TOKEN: ${{ secrets.BUILDKITE_ANALYTICS_API_TOKEN }}
+      BUILDKITE_ANALYTICS_TOKEN: ${{ secrets.BUILDKITE_ANALYTICS_TOKEN }}
     strategy:
       matrix:
         elixir: [1.13.4]

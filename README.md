@@ -28,7 +28,7 @@ import Config
 
 
 config :buildkite_test_collector,
-  api_key: System.get_env("BUILDKITE_ANALYTICS_API_TOKEN")
+  api_key: System.get_env("BUILDKITE_ANALYTICS_TOKEN")
 ```
 
 4. Add `BuildkiteTestCollectorFormatter` to your ExUnit configuration in
