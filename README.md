@@ -1,4 +1,4 @@
-# Buildkite Test Collector for Elixir
+# Buildkite Test Collector for Elixir (Beta)
 
 The official Elixir adapter for [Buildkite Test Analytics](https://buildkite.com/test-analytics) which uses an ExUnit formatter to connect information about your tests.
 
