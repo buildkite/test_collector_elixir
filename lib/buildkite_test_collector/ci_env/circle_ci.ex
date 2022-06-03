@@ -1,6 +1,6 @@
 defmodule BuildkiteTestCollector.CiEnv.CircleCi do
   @moduledoc """
-  Environment detection and configuraiton for Circle CI.
+  Environment detection and configuration for Circle CI.
   """
 
   use BuildkiteTestCollector.CiEnv

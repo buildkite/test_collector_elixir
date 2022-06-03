@@ -1,6 +1,6 @@
 defmodule BuildkiteTestCollector.CiEnv.GithubActions do
   @moduledoc """
-  Environment detection and configuraiton for Github Actions.
+  Environment detection and configuration for Github Actions.
   """
 
   use BuildkiteTestCollector.CiEnv

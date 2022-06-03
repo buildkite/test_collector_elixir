@@ -1,6 +1,6 @@
 defmodule BuildkiteTestCollector.CiEnv.Generic do
   @moduledoc """
-  Environment detection and configuraiton for a Generic CI environment
+  Environment detection and configuration for a Generic CI environment
   """
 
   use BuildkiteTestCollector.CiEnv

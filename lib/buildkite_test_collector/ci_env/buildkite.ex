@@ -1,6 +1,6 @@
 defmodule BuildkiteTestCollector.CiEnv.Buildkite do
   @moduledoc """
-  Environment detection and configuraiton for Buildkite.
+  Environment detection and configuration for Buildkite.
   """
 
   use BuildkiteTestCollector.CiEnv
