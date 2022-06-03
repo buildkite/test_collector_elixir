@@ -7,6 +7,7 @@ defmodule BuildkiteTestCollector.MixProject do
   def project do
     [
       app: :buildkite_test_collector,
+      description: "Official Buildkite Test Analytics Collector",
       version: @version,
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
@@ -32,8 +33,11 @@ defmodule BuildkiteTestCollector.MixProject do
       ],
       licenses: ["MIT"],
       links: %{
-        "Source" => "htts://github.com/buildkite/text_collector_elixir"
-      }
+        "Source" => "https://github.com/buildkite/text_collector_elixir",
+        "Homepage" => "https://buildkite.com/test-analytics"
+      },
+      source_url: "https://github.com/buildkite/text_collector_elixir",
+      homepage_url: "https://buildkite.com/test-analytics"
     ]
   end
 
@@ -53,6 +57,7 @@ defmodule BuildkiteTestCollector.MixProject do
 
       # Dev/test
       {:credo, "~> 1.6", only: [:dev, :test]},
+      {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
       {:doctor, "~> 0.18", only: [:dev, :test]},
       {:git_ops, "~> 2.4", only: [:dev, :test], runtime: false},
       {:mimic, "~> 1.7", only: :test}
