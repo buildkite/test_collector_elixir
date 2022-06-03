@@ -19,5 +19,5 @@ defmodule BuildkiteTestCollector.CiEnv.Generic do
   def ci, do: "generic"
 
   @impl true
-  def key, do: Ecto.UUID.generate()
+  def key, do: UUID.uuid4()
 end

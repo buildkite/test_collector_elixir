@@ -12,7 +12,6 @@ defmodule BuildkiteTestCollector.TestResult do
   # credo:disable-for-this-file Credo.Check.Design.TagTODO
 
   alias BuildkiteTestCollector.{Duration, TestResult}
-  alias Ecto.UUID
 
   @derive Jason.Encoder
   defstruct [
@@ -30,7 +29,7 @@ defmodule BuildkiteTestCollector.TestResult do
 
   @typedoc "Individual test summary.  Spec as yet unconfirmed."
   @type t :: %TestResult{
-          id: UUID.t(),
+          id: String.t(),
           scope: String.t(),
           name: String.t(),
           identifier: String.t(),
@@ -63,7 +62,7 @@ defmodule BuildkiteTestCollector.TestResult do
   @spec new(ExUnit.Test.t(), Duration.t() | nil, Duration.t() | nil) :: t
   def new(%ExUnit.Test{} = test, start_time \\ nil, end_time \\ nil) do
     %TestResult{
-      id: UUID.generate(),
+      id: UUID.uuid4(),
       scope: inspect(test.tags.module),
       name: [test.tags.describe, test.tags.test] |> Enum.filter(& &1) |> Enum.join(" "),
       identifier: "#{test.tags.file}:#{test.tags.line}",

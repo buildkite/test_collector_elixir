@@ -4,7 +4,6 @@ defmodule BuildkiteTestCollector.EnvironmentManipulator do
   """
 
   import ExUnit.Callbacks
-  alias Ecto.UUID
 
   @filter_env_prefixes ["CI", "BUILDKITE", "GITHUB", "CIRCLE"]
 
@@ -36,7 +35,7 @@ defmodule BuildkiteTestCollector.EnvironmentManipulator do
   """
   @spec stub_buildkite_environment(any) :: {:ok, %{env: %{required(String.t()) => String.t()}}}
   def stub_buildkite_environment(_context \\ nil) do
-    build_id = UUID.generate()
+    build_id = UUID.uuid4()
 
     %{
       "BUILDKITE_BUILD_ID" => build_id,
@@ -73,7 +72,7 @@ defmodule BuildkiteTestCollector.EnvironmentManipulator do
   """
   @spec stub_circle_ci_environment(any) :: {:ok, %{env: %{required(String.t()) => String.t()}}}
   def stub_circle_ci_environment(_context \\ nil) do
-    build_id = UUID.generate()
+    build_id = UUID.uuid4()
 
     %{
       "CIRCLE_WORKFLOW_ID" => build_id,
