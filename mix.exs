@@ -2,7 +2,7 @@ defmodule BuildkiteTestCollector.MixProject do
   use Mix.Project
   @moduledoc false
 
-  @version "0.1.0"
+  @version "0.1.1"
 
   def project do
     [
