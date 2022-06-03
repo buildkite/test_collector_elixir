@@ -33,10 +33,10 @@ defmodule BuildkiteTestCollector.MixProject do
       ],
       licenses: ["MIT"],
       links: %{
-        "Source" => "https://github.com/buildkite/text_collector_elixir",
+        "Source" => "https://github.com/buildkite/test_collector_elixir",
         "Homepage" => "https://buildkite.com/test-analytics"
       },
-      source_url: "https://github.com/buildkite/text_collector_elixir",
+      source_url: "https://github.com/buildkite/test_collector_elixir",
       homepage_url: "https://buildkite.com/test-analytics"
     ]
   end
