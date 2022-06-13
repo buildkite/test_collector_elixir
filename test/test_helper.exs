@@ -4,5 +4,6 @@ Mimic.copy(Tesla)
 
 ExUnit.start(
   capture_log: true,
-  formatters: [ExUnit.CLIFormatter, BuildkiteTestCollector.Formatter]
+  formatters: [ExUnit.CLIFormatter, BuildkiteTestCollector.Formatter],
+  exclude: [fixture: true]
 )
