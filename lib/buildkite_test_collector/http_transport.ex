@@ -60,5 +60,5 @@ defmodule BuildkiteTestCollector.HttpTransport do
 
   defp api_key, do: Application.fetch_env!(:buildkite_test_collector, :api_key)
 
-  defp batch_size, do: Application.get_env(:buildkite_test_collector, :batch_size, 500)
+  defp batch_size, do: Application.get_env(:buildkite_test_collector, :batch_size, 100)
 end
