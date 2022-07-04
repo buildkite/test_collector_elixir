@@ -11,10 +11,9 @@ defmodule BuildkiteTestCollector.TestResult do
 
   # credo:disable-for-this-file Credo.Check.Design.TagTODO
 
-  alias BuildkiteTestCollector.{Duration, TestResult}
+  alias BuildkiteTestCollector.{Duration, Instant, TestResult}
   alias Ecto.UUID
 
-  @derive Jason.Encoder
   defstruct [
     :id,
     :scope,
@@ -47,22 +46,32 @@ defmodule BuildkiteTestCollector.TestResult do
           required(:backtrace) => [String.t()]
         }
 
-  @typedoc "A trace of the test run. TBC."
+  @typedoc "The test run timing and tracing"
   @type history :: %{
-          required(:section) => String.t(),
-          required(:start_at) => Duration.t(),
-          required(:end_at) => Duration.t(),
+          required(:start_at) => Instant.t(),
+          required(:end_at) => Instant.t(),
           required(:duration) => number,
-          optional(:children) => [history],
+          required(:children) => [span],
           optional(:detail) => map
+        }
+
+  @typedoc "A tracing span"
+  @type span :: %{
+          required(:section) => :http | :sql | :sleep | :annotation,
+          required(:duration) => Duration.t(),
+          optional(:start_at) => Instant.t(),
+          optional(:end_at) => Instant.t(),
+          optional(:detail) => String.t()
         }
 
   @doc """
   Convert an `ExUnit.Test` into a Buildkite Test Analytics datum.
   """
-  @spec new(ExUnit.Test.t(), Duration.t() | nil, Duration.t() | nil) :: t
-  def new(%ExUnit.Test{} = test, start_time \\ nil, end_time \\ nil) do
+  @spec new(ExUnit.Test.t(), Instant.t() | nil) :: t
+  def new(%ExUnit.Test{} = test, start_time \\ nil) do
     location = "#{test.tags.file}:#{test.tags.line}"
+    duration = Duration.from_microseconds(test.time)
+    end_time = if start_time, do: Instant.add(start_time, duration)
 
     %TestResult{
       id: UUID.generate(),
@@ -75,12 +84,67 @@ defmodule BuildkiteTestCollector.TestResult do
       failure_reason: extract_failure_reason(test.state),
       failure_expanded: extract_failure_expanded(test.state),
       history: %{
-        section: "top",
         start_at: start_time,
         end_at: end_time,
-        duration: test.time / 1_000_000.0
+        duration: duration,
+        children: []
       }
     }
+  end
+
+  @doc """
+  Add a tracing span to the test result history.
+  """
+  @spec add_span(t, span) :: t
+  def add_span(%TestResult{history: %{children: children} = history} = test_result, span),
+    do: %TestResult{test_result | history: %{history | children: [span | children]}}
+
+  @doc """
+  Convert the test result into a map ready for serialisation to JSON.
+
+
+  This is done as a separate step because all timings are relative to the
+  payload start time, so must be calculated.
+  """
+  @spec as_json(t, Instant.t()) :: map
+  def as_json(%TestResult{} = test_result, %Instant{} = started_at) do
+    %{
+      id: test_result.id,
+      scope: test_result.scope,
+      name: test_result.name,
+      identifier: test_result.identifier,
+      location: test_result.location,
+      file_name: test_result.file_name,
+      result: test_result.result,
+      failure_reason: test_result.failure_reason,
+      failure_expanded: test_result.failure_expanded,
+      history: %{
+        section: "top",
+        start_at: elapsed_seconds(test_result.history.start_at, started_at),
+        end_at: elapsed_seconds(test_result.history.end_at, started_at),
+        duration: Duration.as_seconds(test_result.history.duration),
+        children:
+          test_result.history.children
+          |> Enum.map(fn span ->
+            %{
+              section: to_string(span.section),
+              duration: Duration.as_seconds(span.duration),
+              detail: span.detail,
+              start_at: elapsed_seconds(Map.get(span, :start_at), started_at),
+              end_at: elapsed_seconds(Map.get(span, :end_at), started_at)
+            }
+          end)
+          |> Enum.reverse()
+      }
+    }
+  end
+
+  defp elapsed_seconds(nil, _), do: nil
+
+  defp elapsed_seconds(a, b) do
+    Duration.between(a, b)
+    |> Duration.abs()
+    |> Duration.as_seconds()
   end
 
   defp extract_test_scope(%{module: module, tags: %{describe: description}})

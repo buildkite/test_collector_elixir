@@ -1,4 +1,5 @@
 Mimic.copy(BuildkiteTestCollector.CiEnv)
+Mimic.copy(BuildkiteTestCollector.Formatter)
 Mimic.copy(BuildkiteTestCollector.HttpTransport)
 Mimic.copy(Tesla)
 
