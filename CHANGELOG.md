@@ -5,6 +5,19 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.0](https://github.com/buildkite/text_collector_elixir/compare/v0.1.2...v0.2.0) (2022-07-04)
+
+
+
+
+### Features:
+
+* Add manual tracing. (#6)
+
+### Bug Fixes:
+
+* Reduce default batch size from 500 to 100
+
 ## [v0.1.2](https://github.com/buildkite/text_collector_elixir/compare/v0.1.1...v0.1.2) (2022-06-13)
 
 
