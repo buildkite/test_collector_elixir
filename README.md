@@ -58,6 +58,9 @@ Randomized with seed 12345
 
 If all is well, you should see the test run in the test analytics section of the Buildkite dashboard.
 
+## 🎢 Tracing
+
+Buildkite Test Analytics has support for tracing potentially slow operations within your tests (SQL queries, HTTP requests, etc).  Because ExUnit can run multiple tests simultaneously, it is difficult to achieve this without requiring code changes - we cannot simply use [telemetry](https://hex.pm/packages/telemetry) events because we cannot easily attribute the events to specific tests across process boundaries.  Instead we have provided [a simple API](https://hexdocs.pm/buildkite_test_collector/BuildkiteTestCollector.Tracing.html) to manually instrument operations within your tests.
 
 ## 🔜 Roadmap
 

@@ -6,7 +6,7 @@ defmodule BuildkiteTestCollector.HttpTransportTest do
 
   import BuildkiteTestCollector.ExUnitDataHelpers
 
-  alias BuildkiteTestCollector.{CiEnv, Duration, HttpTransport, Payload, TestResult}
+  alias BuildkiteTestCollector.{CiEnv, HttpTransport, Instant, Payload, TestResult, Tracing}
 
   setup do
     old_api_token = Application.get_env(:buildkite_test_collector, :api_key)
@@ -25,7 +25,7 @@ defmodule BuildkiteTestCollector.HttpTransportTest do
   end
 
   describe "send/1" do
-    test "it sends the JSON encoded payload to the server", %{token: token} do
+    test "it sends the JSON encoded payload to the server", tags do
       expect(Tesla, :execute, fn module, _client, options ->
         assert module == HttpTransport
 
@@ -35,15 +35,19 @@ defmodule BuildkiteTestCollector.HttpTransportTest do
         assert options.url == "https://analytics-api.buildkite.com/v1/uploads"
         assert %Payload{} = options.body
         assert extract_header(options.headers, "content-type") =~ ~r/application\/json/
-        assert extract_header(options.headers, "authorization") == "Token token=\"#{token}\""
+        assert extract_header(options.headers, "authorization") == "Token token=\"#{tags.token}\""
 
         {:ok, %{body: %{}}}
       end)
 
-      CiEnv.Generic
-      |> Payload.init()
-      |> Payload.set_start_time(Duration.now())
-      |> HttpTransport.send()
+      payload =
+        CiEnv.Generic
+        |> Payload.init()
+        |> Payload.set_start_time(Instant.now())
+
+      Tracing.measure(tags, :http, "stubbed API request", fn ->
+        HttpTransport.send(payload)
+      end)
     end
   end
 
@@ -63,15 +67,13 @@ defmodule BuildkiteTestCollector.HttpTransportTest do
     end
 
     test "when there are more results than the batch size, it posts a batch and returns a modified payload",
-         %{
-           batch_size: batch_size
-         } do
+         tags do
       payload =
         CiEnv.Generic
         |> Payload.init()
-        |> Payload.set_start_time(Duration.now())
+        |> Payload.set_start_time(Instant.now())
 
-      total_result_size = (batch_size * 1.5) |> trunc()
+      total_result_size = (tags.batch_size * 1.5) |> trunc()
 
       payload =
         1..total_result_size
@@ -82,25 +84,32 @@ defmodule BuildkiteTestCollector.HttpTransportTest do
       expect(Tesla, :execute, fn _module, _client, options ->
         payload = Keyword.fetch!(options, :body)
 
-        assert length(payload.data) == batch_size
-        assert payload.data_size == batch_size
+        assert length(payload.data) == tags.batch_size
+        assert payload.data_size == tags.batch_size
 
         {:ok, %{body: %{}}}
       end)
 
-      assert {:ok, new_payload} = HttpTransport.maybe_send_batch(payload)
+      assert {:ok, new_payload} =
+               Tracing.measure(tags, :http, "stubbed API request", fn ->
+                 HttpTransport.maybe_send_batch(payload)
+               end)
 
       assert new_payload.run_env == payload.run_env
-      assert new_payload.data_size == total_result_size - batch_size
+      assert new_payload.data_size == total_result_size - tags.batch_size
     end
 
-    test "when there are less results than the batch size, it returns the payload unchanged" do
+    test "when there are less results than the batch size, it returns the payload unchanged",
+         tags do
       payload =
         CiEnv.Generic
         |> Payload.init()
-        |> Payload.set_start_time(Duration.now())
+        |> Payload.set_start_time(Instant.now())
 
-      assert {:ok, ^payload} = HttpTransport.maybe_send_batch(payload)
+      assert {:ok, ^payload} =
+               Tracing.measure(tags, :http, "stubbed API request", fn ->
+                 HttpTransport.maybe_send_batch(payload)
+               end)
     end
   end
 

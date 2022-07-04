@@ -5,13 +5,14 @@ defmodule BuildkiteTestCollector.FormatterTest do
   use Mimic
 
   import BuildkiteTestCollector.ExUnitDataHelpers
-  alias BuildkiteTestCollector.{CiEnv, Duration, Formatter, HttpTransport, Payload}
+  alias BuildkiteTestCollector.{CiEnv, Duration, Formatter, HttpTransport, Instant, Payload}
 
   setup do
     state = %{
-      payload: CiEnv.Generic |> Payload.init() |> Payload.set_start_time(Duration.now()),
+      payload: CiEnv.Generic |> Payload.init() |> Payload.set_start_time(Instant.now()),
       stream: false,
-      timings: %{}
+      timings: %{},
+      spans: %{}
     }
 
     {:ok, state: state}
@@ -22,14 +23,14 @@ defmodule BuildkiteTestCollector.FormatterTest do
       CiEnv
       |> stub(:detect_env, fn -> :error end)
 
-      assert :ignore = Formatter.init([])
+      assert :ignore = Formatter.init(register: false)
     end
 
     test "when a CI environment is detected, it starts normally" do
       CiEnv
       |> stub(:detect_env, fn -> {:ok, CiEnv.Generic} end)
 
-      assert {:ok, _pid} = Formatter.init([])
+      assert {:ok, _pid} = Formatter.init(register: false)
     end
   end
 
@@ -43,9 +44,9 @@ defmodule BuildkiteTestCollector.FormatterTest do
       since =
         state.timings
         |> Map.get(test_id(test))
-        |> Duration.since()
+        |> Duration.elapsed()
 
-      assert_in_delta since.offset, 0, 100
+      assert_in_delta since.usec, 0, 100
     end
   end
 
@@ -53,7 +54,7 @@ defmodule BuildkiteTestCollector.FormatterTest do
     test "it removes the start time from the formatter state",
          %{state: state} do
       test = passing_test()
-      state = %{state | timings: Map.put(state.timings, test_id(test), Duration.now())}
+      state = %{state | timings: Map.put(state.timings, test_id(test), Instant.now())}
 
       {:noreply, state} = Formatter.handle_cast({:test_finished, test}, state)
 
@@ -62,11 +63,32 @@ defmodule BuildkiteTestCollector.FormatterTest do
 
     test "places a new test result in the payload", %{state: state} do
       test = passing_test()
-      state = %{state | timings: Map.put(state.timings, test_id(test), Duration.now())}
+      state = %{state | timings: Map.put(state.timings, test_id(test), Instant.now())}
 
       {:noreply, state} = Formatter.handle_cast({:test_finished, test}, state)
 
       assert Enum.count(state.payload.data) == 1
+    end
+
+    test "it moves any spans into the test history", %{state: state} do
+      test = passing_test()
+
+      span = %{
+        section: :annotation,
+        duration: Duration.from_microseconds(100)
+      }
+
+      state =
+        state
+        |> Map.merge(%{
+          timings: Map.put(state.timings, test_id(test), Instant.now()),
+          spans: Map.put(state.spans, test_id(test), [span])
+        })
+
+      {:noreply, state} = Formatter.handle_cast({:test_finished, test}, state)
+      [test_result] = state.payload.data
+
+      assert [^span] = test_result.history.children
     end
   end
 
@@ -74,9 +96,9 @@ defmodule BuildkiteTestCollector.FormatterTest do
     test "it sets the payload started_at time", %{state: state} do
       {:noreply, state} = Formatter.handle_cast({:suite_started, []}, state)
 
-      since = state.payload.started_at |> Duration.since()
+      since = state.payload.started_at |> Duration.elapsed()
 
-      assert_in_delta since.offset, 0, 100
+      assert_in_delta since.usec, 0, 100
     end
   end
 
@@ -91,5 +113,35 @@ defmodule BuildkiteTestCollector.FormatterTest do
     end
   end
 
-  defp test_id(%ExUnit.Test{module: module, name: name}), do: {module, name}
+  describe ":add_span event" do
+    test "when the span has a valid section and duration, it stores the span in the state", %{
+      state: state
+    } do
+      test_id = test_id(passing_test())
+
+      span = %{
+        section: :annotation,
+        duration: Duration.from_microseconds(100)
+      }
+
+      assert {:noreply, state} = Formatter.handle_cast({:add_span, test_id, span}, state)
+      assert [^span] = Map.get(state.spans, test_id)
+    end
+
+    test "when the span has a valid section and start and end times, it adds the duration and stores the span in the state",
+         %{state: state} do
+      test_id = test_id(passing_test())
+
+      start_at = Instant.now()
+      end_at = Instant.add(start_at, Duration.from_seconds(13))
+
+      span = %{section: :sql, start_at: start_at, end_at: end_at}
+
+      assert {:noreply, state} = Formatter.handle_cast({:add_span, test_id, span}, state)
+      assert [span] = Map.get(state.spans, test_id)
+      assert span.duration.usec == 13_000_000
+    end
+  end
+
+  defp test_id(%{module: module, name: name}), do: {module, name}
 end

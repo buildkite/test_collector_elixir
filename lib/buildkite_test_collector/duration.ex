@@ -1,59 +1,59 @@
 defmodule BuildkiteTestCollector.Duration do
+  defstruct usec: 0
+  alias BuildkiteTestCollector.{Duration, Instant}
+
   @moduledoc """
-  The analyics API specifies start and end times in fractional seconds since the
-  beginning of the test run.
+  The difference between two instants with microsecond accuracy.
 
-  It's convenient for us to store these as a duration by specifying their start
-  time and end time and then calculating the diference when serialising into
-  JSON.
-
-  Internally these times are stored as microseconds from the system's monotonic
-  clock.  See `System.monotonic_time/1` for more information.
+  The Buildkite analytics API stores all times as decimal seconds since the
+  start of the test run.  Therefore we use `Duration` to calculate the span
+  between two `Instant` values.
   """
 
-  defstruct [:offset, :epoch]
-  alias __MODULE__
-
-  @type microseconds :: integer
-  @type seconds :: float
-  @type t :: %Duration{
-          epoch: microseconds,
-          offset: microseconds
-        }
+  @type t :: %Duration{usec: integer()}
 
   @doc """
-  The current time based on a zero-microsecond epoch.
-
-  This esspentially returns a duration since the beginning of time, and is not
-  that useful until you use it to as the epoch for other durations.
+  Create a new duration from the specified number of seconds.
   """
-  @spec now :: t
-  def now, do: %Duration{epoch: 0, offset: now_us()}
+  @spec from_seconds(number) :: t
+  def from_seconds(seconds) when is_integer(seconds),
+    do: %Duration{usec: seconds * 1_000_000}
+
+  def from_seconds(seconds) when is_float(seconds),
+    do: %Duration{usec: round(seconds * 1_000_000)}
 
   @doc """
-  Return a new now time based on the provided epoch.
+  Create a new duration directly from microseconds.
   """
-  @spec since(t) :: t
-  def since(%Duration{} = time) do
-    new_epoch = time.epoch + time.offset
-    new_offset = now_us() - new_epoch
-    %Duration{epoch: new_epoch, offset: new_offset}
-  end
+  @spec from_microseconds(number) :: t
+  def from_microseconds(microseconds) when is_integer(microseconds),
+    do: %Duration{usec: microseconds}
+
+  def from_microseconds(microseconds) when is_float(microseconds),
+    do: %Duration{usec: round(microseconds)}
+
+  @doc """
+  Return the elapsed time between two instants.
+  """
+  @spec between(Instant.t(), Instant.t()) :: t
+  def between(%Instant{usec: i0}, %Instant{usec: i1}), do: %Duration{usec: i0 - i1}
+
+  @doc """
+  Return the absolute duration (ie make the duration unsigned).
+  """
+  @spec abs(t) :: t
+  def abs(%Duration{usec: i}) when i < 0, do: %Duration{usec: -i}
+  def abs(%Duration{} = duration), do: duration
+
+  @doc """
+  Returns the elapsed duration between `instant` and now.
+  """
+  @spec elapsed(Instant.t()) :: t
+  def elapsed(%Instant{} = instant), do: Duration.between(Instant.now(), instant)
 
   @doc """
   The duration of the timing, in (fractional) seconds.
   """
-  @spec as_seconds(t) :: seconds
-  def as_seconds(%Duration{offset: offset}), do: offset / 1_000_000.0
-
-  defp now_us, do: System.monotonic_time(:microsecond)
-
-  defimpl Jason.Encoder do
-    @spec encode(Duration.t(), Jason.Encode.opts()) :: iodata
-    def encode(timing, _opts) do
-      timing
-      |> Duration.as_seconds()
-      |> Jason.Encode.float()
-    end
-  end
+  @spec as_seconds(t) :: number
+  def as_seconds(%Duration{usec: i}), do: i / 1_000_000.0
 end

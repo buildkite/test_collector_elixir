@@ -5,12 +5,12 @@ defmodule BuildkiteTestCollector.Payload do
 
   defstruct run_env: nil, data: [], started_at: nil, data_size: 0
 
-  alias BuildkiteTestCollector.{CiEnv, Duration, Payload, TestResult}
+  alias BuildkiteTestCollector.{CiEnv, Instant, Payload, TestResult}
 
   @type t :: %Payload{
           run_env: serialised_environment,
           data: [TestResult.t()],
-          started_at: nil | Duration.t(),
+          started_at: nil | Instant.t(),
           data_size: non_neg_integer()
         }
 
@@ -48,7 +48,7 @@ defmodule BuildkiteTestCollector.Payload do
   @doc """
   Set the start time of the suite.
   """
-  @spec set_start_time(Payload.t(), Duration.t()) :: Payload.t()
+  @spec set_start_time(Payload.t(), Instant.t()) :: Payload.t()
   def set_start_time(%Payload{} = payload, started_at), do: %{payload | started_at: started_at}
 
   defp serialise_env(ci_env_mod) do
@@ -57,5 +57,33 @@ defmodule BuildkiteTestCollector.Payload do
       :CI, env -> Map.put(env, :CI, ci_env_mod.ci())
       key, env -> Map.put(env, key, apply(ci_env_mod, key, []))
     end)
+  end
+
+  @doc """
+  Convert the payload into a map ready for serialisation to JSON.
+
+  This is done as a separate step because all timings are relative to the
+  payload start time, so must be calculated.
+  """
+  @spec as_json(t) :: map
+  def as_json(%Payload{} = payload) do
+    %{
+      format: "json",
+      run_env: payload.run_env,
+      data:
+        payload.data
+        |> Enum.map(&TestResult.as_json(&1, payload.started_at))
+        |> Enum.reverse()
+    }
+  end
+
+  defimpl Jason.Encoder do
+    @doc false
+    @spec encode(Payload.t(), Jason.Encode.opts()) :: iodata
+    def encode(payload, opts) do
+      payload
+      |> Payload.as_json()
+      |> Jason.Encode.map(opts)
+    end
   end
 end
