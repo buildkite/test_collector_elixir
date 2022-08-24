@@ -6,8 +6,7 @@ defmodule BuildkiteTestCollector.HttpTransport do
 
   alias BuildkiteTestCollector.Payload
   use Tesla, only: [:post], docs: false
-
-  adapter Tesla.Adapter.Mint
+  adapter Tesla.Adapter.Hackney
   plug Tesla.Middleware.JSON, engine: Jason
 
   @doc """
