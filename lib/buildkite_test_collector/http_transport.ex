@@ -7,7 +7,7 @@ defmodule BuildkiteTestCollector.HttpTransport do
   alias BuildkiteTestCollector.Payload
   use Tesla, only: [:post], docs: false
 
-  adapter Tesla.Adapter.Mint
+  adapter Tesla.Adapter.Mint, timeout: 120_000
   plug Tesla.Middleware.JSON, engine: Jason
 
   @doc """
@@ -15,7 +15,7 @@ defmodule BuildkiteTestCollector.HttpTransport do
   """
   @spec send(Payload.t()) :: {:ok, map} | {:error, any}
   def send(payload) do
-    case post(endpoint(), payload, headers: headers()) do
+    case post(endpoint(), payload, headers: headers(), opts: [adapter: [protocols: [:http1]]]) do
       {:ok, _} -> {:ok, %{payload: %{data: [], data_size: 0}}}
       {:error, reason} -> {:error, reason}
     end
