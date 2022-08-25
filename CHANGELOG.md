@@ -5,6 +5,17 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.1](https://github.com/buildkite/text_collector_elixir/compare/v0.2.0...v0.2.1) (2022-08-25)
+
+
+
+
+### Bug Fixes:
+
+* Force mint to use HTTP1. (#11)
+
+* Force Mint to use HTTP1 transport.
+
 ## [v0.2.0](https://github.com/buildkite/text_collector_elixir/compare/v0.1.2...v0.2.0) (2022-07-04)
 
 
