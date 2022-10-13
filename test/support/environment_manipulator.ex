@@ -96,6 +96,17 @@ defmodule BuildkiteTestCollector.EnvironmentManipulator do
     |> stub_env()
   end
 
+  @doc """
+  Make the environment look like a local run
+  """
+  @spec stub_local_environment(any) :: {:ok, %{env: %{required(String.t()) => String.t()}}}
+  def stub_local_environment(_context \\ nil) do
+    %{
+      "BUILDKITE_TEST_ANALYTICS_LOCAL" => "true"
+    }
+    |> stub_env()
+  end
+
   defp stub_env(env) do
     for {name, value} <- env do
       System.put_env(name, value)
