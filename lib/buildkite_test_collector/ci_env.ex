@@ -59,7 +59,7 @@ defmodule BuildkiteTestCollector.CiEnv do
   """
   @spec detect_env :: {:ok, module} | :error
   def detect_env do
-    [CiEnv.Buildkite, CiEnv.CircleCi, CiEnv.GithubActions, CiEnv.Generic]
+    [CiEnv.Buildkite, CiEnv.CircleCi, CiEnv.GithubActions, CiEnv.Generic, CiEnv.Local]
     |> Enum.find_value(:error, fn module ->
       if module.detected?(), do: {:ok, module}
     end)

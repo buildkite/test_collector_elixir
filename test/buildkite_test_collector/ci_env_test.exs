@@ -35,5 +35,11 @@ defmodule BuildkiteTestCollector.CiEnvTest do
 
       assert {:ok, CiEnv.Generic} = CiEnv.detect_env()
     end
+
+    test "when there are local dev environment variables present" do
+      stub_local_environment()
+
+      assert {:ok, CiEnv.Local} = CiEnv.detect_env()
+    end
   end
 end
