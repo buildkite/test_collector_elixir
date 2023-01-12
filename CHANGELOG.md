@@ -12,7 +12,7 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 ### Features:
 
-* Add collector and version to all analytics API payloads
+* Add collector and version to all analytics API payloads(#13)
 
 * Add local test environment to get flakey test from dev environment (#12)
 
