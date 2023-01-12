@@ -22,9 +22,7 @@ defmodule BuildkiteTestCollector.Payload do
           optional(:branch) => String.t(),
           optional(:commit_sha) => String.t(),
           optional(:message) => String.t(),
-          optional(:url) => String.t(),
-          required(:collector) => String.t(),
-          required(:version) => String.t()
+          optional(:url) => String.t()
         }
 
   @doc """
@@ -54,7 +52,7 @@ defmodule BuildkiteTestCollector.Payload do
   def set_start_time(%Payload{} = payload, started_at), do: %{payload | started_at: started_at}
 
   defp serialise_env(ci_env_mod) do
-    ~w[CI key number job_id branch commit_sha message url collector version]a
+    ~w[CI key number job_id branch commit_sha message url]a
     |> Enum.reduce(%{}, fn
       :CI, env -> Map.put(env, :CI, ci_env_mod.ci())
       key, env -> Map.put(env, key, apply(ci_env_mod, key, []))

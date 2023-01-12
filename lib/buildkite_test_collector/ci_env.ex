@@ -52,15 +52,6 @@ defmodule BuildkiteTestCollector.CiEnv do
   """
   @callback message() :: nil | String.t()
 
-  @doc """
-  Name of test collector
-  """
-  @callback collector() :: String.t()
-  @doc """
-  Version of test collector
-  """
-  @callback version() :: String.t()
-
   @optional_callbacks url: 0, branch: 0, commit_sha: 0, number: 0, job_id: 0, message: 0
 
   @doc """

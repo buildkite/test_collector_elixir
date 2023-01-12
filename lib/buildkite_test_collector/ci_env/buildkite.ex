@@ -35,10 +35,4 @@ defmodule BuildkiteTestCollector.CiEnv.Buildkite do
 
   @impl true
   def message, do: System.get_env("BUILDKITE_MESSAGE")
-
-  @impl true
-  def collector, do: BuildkiteTestCollector.MixProject.collector_name()
-
-  @impl true
-  def version, do: BuildkiteTestCollector.MixProject.version()
 end
