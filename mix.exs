@@ -2,11 +2,14 @@ defmodule BuildkiteTestCollector.MixProject do
   use Mix.Project
   @moduledoc false
 
-  @version "0.2.0"
+  @version "0.2.2"
+  def version, do: @version
+  @collector_name :buildkite_test_collector
+  def collector_name, do: "elixir-#{@collector_name}"
 
   def project do
     [
-      app: :buildkite_test_collector,
+      app: @collector_name,
       description: "Official Buildkite Test Analytics Collector",
       version: @version,
       elixir: "~> 1.13",

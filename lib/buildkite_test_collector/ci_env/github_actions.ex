@@ -37,4 +37,10 @@ defmodule BuildkiteTestCollector.CiEnv.GithubActions do
 
   @impl true
   def number, do: System.get_env("GITHUB_RUN_NUMBER")
+
+  @impl true
+  def collector, do: BuildkiteTestCollector.MixProject.collector_name()
+
+  @impl true
+  def version, do: BuildkiteTestCollector.MixProject.version()
 end

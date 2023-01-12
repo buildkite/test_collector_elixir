@@ -20,4 +20,10 @@ defmodule BuildkiteTestCollector.CiEnv.Local do
 
   @impl true
   def key, do: Ecto.UUID.generate()
+
+  @impl true
+  def collector, do: BuildkiteTestCollector.MixProject.collector_name()
+
+  @impl true
+  def version, do: BuildkiteTestCollector.MixProject.version()
 end

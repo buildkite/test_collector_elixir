@@ -22,6 +22,8 @@ defmodule BuildkiteTestCollector.PayloadTest do
       assert run_env.message == env["BUILDKITE_MESSAGE"]
       assert run_env.url =~ "http"
       assert run_env.url =~ env["BUILDKITE_BUILD_ID"]
+      assert run_env.collector == BuildkiteTestCollector.MixProject.collector_name()
+      assert run_env.version == BuildkiteTestCollector.MixProject.version()
     end
 
     test "it initialises with empty data" do
