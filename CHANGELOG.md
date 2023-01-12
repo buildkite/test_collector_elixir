@@ -5,6 +5,17 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.0](https://github.com/buildkite/text_collector_elixir/compare/v0.2.0...v0.3.0) (2023-01-12)
+
+
+
+
+### Features:
+
+* Add collector and version to all analytics API payloads
+
+* Add local test environment to get flakey test from dev environment (#12)
+
 ## [v0.2.0](https://github.com/buildkite/text_collector_elixir/compare/v0.1.2...v0.2.0) (2022-07-04)
 
 
