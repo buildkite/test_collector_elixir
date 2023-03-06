@@ -13,6 +13,10 @@ defmodule BuildkiteTestCollector.TestResultTest do
 
       assert result.result == "passed"
       assert result.scope == "PassingTest"
+      assert result.identifier == "test/support/fixture_tests/passing_test.exs:5"
+      assert result.location == "test/support/fixture_tests/passing_test.exs:5"
+      assert result.file_name == "test/support/fixture_tests/passing_test.exs"
+      assert result.name == "PassingTest test passing"
       refute result.failure_reason
       refute result.failure_expanded
     end
