@@ -51,7 +51,7 @@ defmodule BuildkiteTestCollector.ExUnitDataHelpers do
             },
             [
               {FailingTest, :"test failing", 1,
-               [file: 'test/support/fixture_tests/failing_test.exs', line: 6]}
+               [file: ~c"test/support/fixture_tests/failing_test.exs", line: 6]}
             ]}
          ]},
       tags: %{
@@ -113,12 +113,12 @@ defmodule BuildkiteTestCollector.ExUnitDataHelpers do
                  [
                    {InvalidTest, :__ex_unit_setup_all_0, 1,
                     [
-                      file: 'test/support/fixture_tests/invalid_test.exs',
+                      file: ~c"test/support/fixture_tests/invalid_test.exs",
                       line: 6,
                       error_info: %{module: Exception}
                     ]},
                    {InvalidTest, :__ex_unit__, 2,
-                    [file: 'test/support/fixture_tests/invalid_test.exs', line: 1]}
+                    [file: ~c"test/support/fixture_tests/invalid_test.exs", line: 1]}
                  ]}
               ]},
            tests: [
