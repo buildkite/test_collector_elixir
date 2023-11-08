@@ -58,7 +58,7 @@ defmodule BuildkiteTestCollector.Tracing do
   end
   ```
   """
-  @spec measure(tags, section, nil | String.t(), (() -> result)) :: result when result: any
+  @spec measure(tags, section, nil | String.t(), (-> result)) :: result when result: any
   def measure(%{module: module, test: name} = _tags, section, detail \\ nil, callable)
       when is_function(callable, 0) do
     start_at = Instant.now()
