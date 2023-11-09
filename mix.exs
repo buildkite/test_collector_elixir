@@ -51,7 +51,7 @@ defmodule BuildkiteTestCollector.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      {:castore, "~> 0.1"},
+      {:castore, "~> 1.0"},
       {:ecto, "~> 3.8"},
       {:jason, "~> 1.3"},
       {:mint, "~> 1.4"},
