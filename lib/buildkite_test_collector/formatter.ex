@@ -111,7 +111,7 @@ defmodule BuildkiteTestCollector.Formatter do
         {:ok, state}
 
       :error ->
-        Logger.warn("Not starting BuildkiteTestCollector server.  No CI environment detected.")
+        Logger.warning("Not starting BuildkiteTestCollector server.  No CI environment detected.")
 
         :ignore
     end
@@ -166,7 +166,7 @@ defmodule BuildkiteTestCollector.Formatter do
         end
 
       {nil, _timings} ->
-        Logger.warn(
+        Logger.warning(
           "Received `test_finished` event for #{inspect(module)}/#{inspect(name)} out of order"
         )
 
@@ -211,7 +211,7 @@ defmodule BuildkiteTestCollector.Formatter do
        do: {:ok, Map.put(span, :duration, Duration.between(end_at, start_at))}
 
   defp refine_span(span) do
-    Logger.warn("Invalid span: #{inspect(span)}")
+    Logger.warning("Invalid span: #{inspect(span)}")
     :error
   end
 end
