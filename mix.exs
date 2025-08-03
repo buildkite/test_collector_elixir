@@ -64,7 +64,7 @@ defmodule BuildkiteTestCollector.MixProject do
       {:ex_doc, ">= 0.0.0", only: [:dev, :test]},
       {:doctor, "~> 0.18", only: [:dev, :test]},
       {:git_ops, "~> 2.4", only: [:dev, :test], runtime: false},
-      {:mimic, "~> 1.7", only: :test}
+      {:mimic, "~> 2.0", only: :test}
     ]
   end
 end
