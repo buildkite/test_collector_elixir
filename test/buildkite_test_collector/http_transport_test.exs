@@ -26,14 +26,11 @@ defmodule BuildkiteTestCollector.HttpTransportTest do
 
   describe "send/1" do
     test "it sends the JSON encoded payload to the server", tags do
-      expect(Tesla, :execute, fn module, _client, options ->
-        assert module == HttpTransport
+      expect(Req, :post, fn options ->
+        options = Map.new(options)
 
-        options = options |> Enum.into(%{})
-
-        assert options.method == :post
         assert options.url == "https://analytics-api.buildkite.com/v1/uploads"
-        assert %Payload{} = options.body
+        assert %Payload{} = options.json
         assert extract_header(options.headers, "content-type") =~ ~r/application\/json/
         assert extract_header(options.headers, "authorization") == "Token token=\"#{tags.token}\""
 
@@ -81,8 +78,8 @@ defmodule BuildkiteTestCollector.HttpTransportTest do
           Payload.push_test_result(payload, TestResult.new(passing_test()))
         end)
 
-      expect(Tesla, :execute, fn _module, _client, options ->
-        payload = Keyword.fetch!(options, :body)
+      expect(Req, :post, fn options ->
+        payload = options[:json]
 
         assert length(payload.data) == tags.batch_size
         assert payload.data_size == tags.batch_size

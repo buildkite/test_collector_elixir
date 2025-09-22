@@ -55,8 +55,7 @@ defmodule BuildkiteTestCollector.MixProject do
       {:castore, "~> 1.0"},
       {:ecto, "~> 3.8"},
       {:jason, "~> 1.3"},
-      {:mint, "~> 1.4"},
-      {:tesla, "~> 1.4"},
+      {:req, "~> 0.5.15"},
       {:telemetry, "~> 1.1"},
 
       # Dev/test
