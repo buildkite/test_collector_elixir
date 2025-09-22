@@ -88,8 +88,20 @@ defmodule BuildkiteTestCollector.CiEnv do
       def number, do: nil
       def job_id, do: nil
       def message, do: nil
+      def collector, do: :elixir_buildkite_test_collector
 
-      defoverridable url: 0, branch: 0, commit_sha: 0, number: 0, job_id: 0, message: 0
+      def version do
+        :buildkite_test_collector
+        |> Application.spec(:vsn)
+        |> to_string()
+      end
+
+      defoverridable url: 0,
+                     branch: 0,
+                     commit_sha: 0,
+                     number: 0,
+                     job_id: 0,
+                     message: 0
     end
   end
 end
