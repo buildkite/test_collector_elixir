@@ -14,7 +14,7 @@ The official Elixir adapter for [Buildkite Test Analytics](https://buildkite.com
 ```elixir
 def deps do
   [
-    {:buildkite_test_collector, "~> 0.3.1", only: [:test]}
+    {:buildkite_test_collector, "~> 0.3.2", only: [:test]}
   ]
 end
 ```
