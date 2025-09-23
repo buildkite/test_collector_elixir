@@ -34,10 +34,4 @@ defmodule BuildkiteTestCollector.CiEnv.CircleCi do
 
   @impl true
   def number, do: System.get_env("CIRCLE_BUILD_NUM")
-
-  @impl true
-  def collector, do: BuildkiteTestCollector.MixProject.collector_name()
-
-  @impl true
-  def version, do: BuildkiteTestCollector.MixProject.version()
 end
