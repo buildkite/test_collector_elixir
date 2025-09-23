@@ -5,6 +5,21 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.3.2](https://github.com/buildkite/text_collector_elixir/compare/v0.3.1...v0.3.2) (2025-09-23)
+
+
+
+
+### Bug Fixes:
+
+* invalid references to Mix project module. (#132) by James Harton
+
+### Improvements:
+
+* replace tesla with req (#133) by James Harton
+
+* Use `req` instead of `tesla` for HTTP client by James Harton
+
 ## [v0.3.1](https://github.com/buildkite/text_collector_elixir/compare/v0.3.0...v0.3.1) (2025-03-25)
 
 
